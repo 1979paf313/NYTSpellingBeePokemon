@@ -1,0 +1,117 @@
+name: Daily Bee and website
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # 08:17 UTC is 4:17 a.m. Eastern in summer and 3:17 a.m. in winter.
+    # Later runs retry if the source has not caught up; successful days skip fetching.
+    - cron: '17 8,9,10,11,12,15 * * *'
+  workflow_dispatch:
+    inputs:
+      center:
+        description: 'Manual backup: center letter (leave blank for automatic retrieval)'
+        required: false
+        type: string
+      outer:
+        description: 'Manual backup: six outer letters, e.g. B D F L O R'
+        required: false
+        type: string
+      date:
+        description: 'Puzzle date YYYY-MM-DD (leave blank for today in New York)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: daily-bee-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: read
+    outputs:
+      deploy: ${{ steps.decide.outputs.deploy }}
+    steps:
+      - name: Check out the latest main branch
+        uses: actions/checkout@v6
+        with:
+          ref: main
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Check updater behavior
+        run: python -m unittest discover -s tests -p 'test_*.py'
+      - name: Get or enter the daily letters
+        id: update
+        env:
+          MANUAL_CENTER: ${{ inputs.center }}
+          MANUAL_OUTER: ${{ inputs.outer }}
+          PUZZLE_DATE: ${{ inputs.date }}
+        shell: bash
+        run: |
+          args=()
+          if [[ "$GITHUB_EVENT_NAME" == "push" ]]; then
+            args+=(--allow-stale)
+          fi
+          python scripts/update_bee.py "${args[@]}"
+      - name: Check the browser's puzzle rules
+        run: |
+          node --check core.js
+          node --check script.js
+          node tests/core.test.cjs
+          node tests/interface.test.cjs
+      - name: Keep the letters and history in the repository
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/daily-bee.json data/history.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update daily Bee letters'
+            git push origin HEAD:main
+          fi
+      - name: Decide whether a deployment is needed
+        id: decide
+        env:
+          CHANGED: ${{ steps.update.outputs.changed }}
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" != "schedule" || "$CHANGED" == "true" ]]; then
+            echo 'deploy=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'deploy=false' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Configure GitHub Pages
+        if: steps.decide.outputs.deploy == 'true'
+        uses: actions/configure-pages@v5
+      - name: Assemble the public website
+        if: steps.decide.outputs.deploy == 'true'
+        run: |
+          mkdir -p _site/data
+          cp index.html core.js script.js theme.css icon.svg _site/
+          cp data/pokemon.json data/daily-bee.json data/history.json _site/data/
+      - name: Upload website
+        if: steps.decide.outputs.deploy == 'true'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+  deploy:
+    if: needs.build.outputs.deploy == 'true'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish website
+        id: deployment
+        uses: actions/deploy-pages@v4
