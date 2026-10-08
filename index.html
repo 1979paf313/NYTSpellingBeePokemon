@@ -1,12 +1,102 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Spelling Bee Pokémon</title>
+  <meta name="theme-color" content="#f7f5ef">
+  <meta name="description" content="Can you spell a Pokémon with today's NYT Spelling Bee letters? Check, guess, and reveal.">
+  <title>Is there a Pokémon in today's Spelling Bee?</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="theme.css">
+  <script src="core.js" defer></script>
+  <script src="script.js" defer></script>
 </head>
 <body>
-  <h1>Is there a Pokémon in today's Spelling Bee?</h1>
-  <p>Coming soon!</p>
+  <main>
+    <header class="masthead">
+      <span class="brand"><img src="icon.svg" alt="" width="22" height="22"> Goose Suit Games</span>
+      <span class="edition">A little daily curiosity</span>
+    </header>
+    <section class="intro">
+      <h1>Is there a Pokémon in<br class="desktop-break"> today's Spelling Bee?</h1>
+      <p>Seven letters. A whole Pokédex. Can you find one?</p>
+    </section>
+    <div id="load-message" role="status">Checking the hive…</div>
+    <section id="game" class="game-card" hidden aria-label="Pokémon letter challenge">
+      <div class="puzzle-side">
+        <p id="puzzle-date" class="eyebrow"></p>
+        <div id="hive" class="hive" aria-label="Puzzle letters"></div>
+        <p class="hive-caption">The gold letter goes in every name.</p>
+        <a class="text-link" href="https://www.nytimes.com/puzzles/spelling-bee" target="_blank" rel="noopener">Open NYT Spelling Bee ↗</a>
+      </div>
+      <div class="answer-side">
+        <p class="eyebrow">And the answer is…</p>
+        <h2 id="outcome"></h2>
+        <p id="outcome-detail"></p>
+        <p id="freshness" class="notice" hidden></p>
+        <form id="guess-form" autocomplete="off">
+          <label for="guess">Guess a Pokémon</label>
+          <div class="guess-row">
+            <input id="guess" name="guess" type="text" placeholder="Pokémon name" spellcheck="false" autocapitalize="none" maxlength="60">
+            <button type="submit" class="primary">Check</button>
+          </div>
+        </form>
+        <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+        <div id="progress" class="progress"></div>
+        <ul id="found-list" class="found-list"></ul>
+        <div class="game-actions">
+          <button id="reveal" type="button" class="secondary">Reveal answers</button>
+          <button id="share" type="button" class="text-button">Share result</button>
+        </div>
+        <div id="revealed" hidden></div>
+      </div>
+    </section>
+    <div class="below-game">
+      <details class="panel">
+        <summary>How this works</summary>
+        <div class="panel-body">
+          <p>Find an official English Pokémon species name using only the seven letters. Letters can repeat, the center letter must appear, and the name needs at least four letters.</p>
+          <p>We ignore spaces, punctuation, accents, and gender symbols: <strong>Mr. Mime → mrmime</strong>, <strong>Ho-Oh → hooh</strong>, <strong>Flabébé → flabebe</strong>. Alternate forms don't count. Mew and Muk are too short; Porygon2 contains a digit, so it doesn't count. Typing “Nidoran” finds both Nidoran species when eligible.</p>
+          <p><strong>YES</strong> means at least one name uses the center letter. <strong>ALMOST</strong> means some names fit only if you leave it out. <strong>NO</strong> means none fit either way.</p>
+          <p>These names fit the letter rules; the NYT game may not accept them as words. Your guesses stay on this device. No account needed.</p>
+        </div>
+      </details>
+      <details class="panel" id="history-panel">
+        <summary>How often is the answer yes?</summary>
+        <div class="panel-body">
+          <p id="history-status">Loading the archive…</p>
+          <div id="history-content" hidden>
+            <div id="stats" class="stats"></div>
+            <p id="history-note" class="muted"></p>
+            <form id="archive-form" class="archive-form">
+              <label for="archive-date">Try a past Bee</label>
+              <div class="guess-row"><input type="date" id="archive-date" required><button class="secondary" type="submit">Play</button></div>
+            </form>
+            <details class="small-details"><summary>Most frequently eligible Pokémon (spoilers)</summary><ol id="top-pokemon"></ol></details>
+          </div>
+        </div>
+      </details>
+      <details class="panel" id="manual-panel">
+        <summary>Enter letters yourself</summary>
+        <div class="panel-body">
+          <p>Check any seven letters here. This changes the puzzle on your screen.</p>
+          <form id="manual-form">
+            <div class="manual-fields">
+              <label>Center letter<input name="center" type="text" maxlength="1" pattern="[A-Za-z]" required autocapitalize="characters" autocomplete="off"></label>
+              <label>Six outer letters<input name="outer" type="text" placeholder="B D F L O R" required autocapitalize="characters" autocomplete="off" maxlength="24"></label>
+            </div>
+            <button class="secondary" type="submit">Check these letters</button>
+            <button id="back-daily" type="button" class="text-button">Back to daily Bee</button>
+            <p id="manual-feedback" class="feedback" role="status"></p>
+          </form>
+          <p class="owner-note">Site owner? <a href="https://github.com/1979paf313/NYTSpellingBeePokemon/actions/workflows/daily.yml" target="_blank" rel="noopener">Update the daily letters for everyone ↗</a>. Choose “Run workflow” and fill in the center and outer letters.</p>
+        </div>
+      </details>
+    </div>
+    <footer>
+      <p>Daily letter data: <a href="https://spellingbeesolver.dev/archive/" target="_blank" rel="noopener">SpellingBee Solver</a> · Pokémon names: <a href="https://pokeapi.co/" target="_blank" rel="noopener">PokéAPI</a></p>
+      <p>An unofficial fan project. Not affiliated with The New York Times, Nintendo, Game Freak, or The Pokémon Company.</p>
+    </footer>
+  </main>
 </body>
 </html>
