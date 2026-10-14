@@ -1,14 +1,13 @@
 {
-  "date": "2026-10-13",
-  "center": "d",
+  "date": "2026-10-14",
+  "center": "e",
   "outer": [
-    "r",
-    "a",
+    "b",
     "i",
-    "n",
+    "k",
+    "l",
     "o",
-    "p"
+    "x"
   ],
-  "manual": true,
-  "source": "manual"
+  "source": "https://spellingbeesolver.dev/archive/"
 }
