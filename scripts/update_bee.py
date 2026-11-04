@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch letter metadata or accept manual letters; keep the published Bee and archive.
+"""Fetch letter metadata or accept manual letters; keep the published Bee and archive. 
 
 Python standard library only. This never stores the NYT word answer list.
 """
