@@ -1,13 +1,13 @@
 {
-  "date": "2026-11-10",
-  "center": "i",
+  "date": "2026-11-11",
+  "center": "v",
   "outer": [
+    "c",
     "d",
     "e",
-    "f",
-    "l",
-    "o",
-    "p"
+    "i",
+    "t",
+    "u"
   ],
   "source": "https://spellingbeesolver.dev/archive/"
 }
