@@ -1,13 +1,13 @@
 {
-  "date": "2026-11-23",
-  "center": "r",
+  "date": "2026-11-24",
+  "center": "a",
   "outer": [
-    "a",
-    "j",
+    "c",
+    "i",
     "l",
-    "m",
-    "o",
+    "t",
+    "u",
     "y"
   ],
-  "source": "https://spellingbeesolver.dev/archive/"
+  "source": "https://www.dailyspellingbee.com/"
 }
